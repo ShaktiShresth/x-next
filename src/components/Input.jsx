@@ -11,6 +11,13 @@ import {
 } from "firebase/storage";
 import { app } from "../firebase";
 import { IoWarningOutline } from "react-icons/io5";
+import {
+  addDoc,
+  collection,
+  getFirestore,
+  serverTimestamp,
+} from "firebase/firestore";
+import { ImSpinner9 } from "react-icons/im";
 
 const Input = () => {
   const { data: session } = useSession();
@@ -19,6 +26,10 @@ const Input = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageFileUploading, setImageFileUploading] = useState(false);
   const [imageUploadError, setImageUploadError] = useState(null);
+
+  const [text, setText] = useState("");
+  const [postLoading, setPostLoading] = useState(false);
+  const db = getFirestore(app);
 
   const addImageToPost = (ev) => {
     setImageUploadError(null);
@@ -68,6 +79,22 @@ const Input = () => {
     }
   }, [selectedFile]);
 
+  const handleSubmitPost = async () => {
+    setPostLoading(true);
+    const docRef = await addDoc(collection(db, "posts"), {
+      uid: session.user.uid,
+      name: session.user.name,
+      text,
+      profileImg: session.user.image,
+      timestamp: serverTimestamp(),
+      image: imageFileUrl,
+    });
+    setPostLoading(false);
+    setText("");
+    setImageFileUrl(null);
+    setSelectedFile(null);
+  };
+
   if (!session) return null;
 
   return (
@@ -84,6 +111,8 @@ const Input = () => {
           placeholder="Whats happening..."
           rows="2"
           className="w-full border-none outline-none tracking-wide min-h-[50px] text-gray-700"
+          value={text}
+          onChange={(ev) => setText(ev.target.value)}
         ></textarea>
 
         {selectedFile && (
@@ -92,7 +121,9 @@ const Input = () => {
             <img
               src={imageFileUrl}
               alt="post-image"
-              className="w-full max-h-[250px] object-cover cursor-pointer"
+              className={`w-full max-h-[250px] object-cover cursor-pointer ${
+                imageFileUploading ? "animate-pulse" : ""
+              }`}
             />
           </>
         )}
@@ -118,8 +149,18 @@ const Input = () => {
             hidden
           />
 
-          <button className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50">
-            Post
+          <button
+            disabled={text.trim() === "" || !selectedFile || imageFileUploading}
+            className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50"
+            onClick={handleSubmitPost}
+          >
+            {postLoading ? (
+              <div className="px-2">
+                <ImSpinner9 className="size-5 animate-spin" />
+              </div>
+            ) : (
+              "Post"
+            )}
           </button>
         </div>
       </div>
