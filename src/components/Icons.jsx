@@ -19,7 +19,7 @@ import {
 import { app } from "../firebase";
 import { useEffect, useState } from "react";
 
-const Icons = ({ id }) => {
+const Icons = ({ id, uid }) => {
   const { data: session } = useSession();
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState([]);
@@ -37,6 +37,23 @@ const Icons = ({ id }) => {
       }
     } else {
       signIn();
+    }
+  };
+
+  const deletePost = async () => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      if (session?.user?.uid === uid) {
+        await deleteDoc(doc(db, "posts", id))
+          .then(() => {
+            console.log("Document has been deleted successfully!");
+            window.location.reload();
+          })
+          .catch((err) => {
+            console.error("Error deleting the document: ", err);
+          });
+      } else {
+        alert("Sorry, you are unauthorized to delete this post.");
+      }
     }
   };
 
@@ -75,7 +92,12 @@ const Icons = ({ id }) => {
         )}
       </div>
 
-      <HiOutlineTrash className="size-8 cursor-pointer rounded-full transition duration-500 ease-in-out p-2 hover:text-red-500 hover:bg-red-100" />
+      {session?.user?.uid === uid && (
+        <HiOutlineTrash
+          onClick={deletePost}
+          className="size-8 cursor-pointer rounded-full transition duration-500 ease-in-out p-2 hover:text-red-500 hover:bg-red-100"
+        />
+      )}
     </div>
   );
 };
