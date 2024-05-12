@@ -84,6 +84,7 @@ const Input = () => {
     const docRef = await addDoc(collection(db, "posts"), {
       uid: session.user.uid,
       name: session.user.name,
+      username: session.user.username,
       text,
       profileImg: session.user.image,
       timestamp: serverTimestamp(),
@@ -93,6 +94,7 @@ const Input = () => {
     setText("");
     setImageFileUrl(null);
     setSelectedFile(null);
+    location.reload();
   };
 
   if (!session) return null;
@@ -150,7 +152,7 @@ const Input = () => {
           />
 
           <button
-            disabled={text.trim() === "" || !selectedFile || imageFileUploading}
+            disabled={text.trim() === "" || postLoading || imageFileUploading}
             className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50"
             onClick={handleSubmitPost}
           >
