@@ -13,7 +13,7 @@ const Post = ({ post, id }) => {
       <div className="flex-1">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1 whitespace-nowrap">
-            <h4 className="font-bold text-xs truncate">{post?.name}</h4>
+            <h4 className="font-bold text-sm truncate">{post?.name}</h4>
             <span className="text-xs truncate">@{post?.username}</span>
           </div>
           <HiDotsHorizontal className="text-gray-500" />
@@ -26,7 +26,7 @@ const Post = ({ post, id }) => {
           <img src={post?.image} className="rounded-2xl mr-2 " />
         </Link>
 
-        <Icons />
+        <Icons id={id} />
       </div>
     </div>
   );
