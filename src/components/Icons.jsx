@@ -19,7 +19,7 @@ import {
 import { app } from "../firebase";
 import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
-import { modalState } from "@/atom/modalAtom";
+import { modalState, postIdState } from "@/atom/modalAtom";
 
 const Icons = ({ id, uid }) => {
   const { data: session } = useSession();
@@ -28,6 +28,7 @@ const Icons = ({ id, uid }) => {
   const db = getFirestore(app);
 
   const [open, setOpen] = useRecoilState(modalState);
+  const [postId, setPostId] = useRecoilState(postIdState);
 
   const likePost = async () => {
     if (session) {
@@ -76,7 +77,14 @@ const Icons = ({ id, uid }) => {
   return (
     <div className="flex justify-start gap-5 py-2 text-gray-500">
       <HiOutlineChat
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          if (!session) {
+            signIn();
+          } else {
+            setOpen(!open);
+            setPostId(id);
+          }
+        }}
         className="size-8 cursor-pointer rounded-full transition duration-500 ease-in-out p-2 hover:text-sky-500 hover:bg-sky-100"
       />
 
