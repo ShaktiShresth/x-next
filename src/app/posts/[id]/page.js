@@ -1,3 +1,4 @@
+import Comments from "@/components/Comments";
 import Post from "@/components/Post";
 import { app } from "@/firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
@@ -20,6 +21,8 @@ const PostPage = async ({ params }) => {
       </div>
 
       <Post post={data} id={data.id} />
+
+      <Comments id={params.id} />
     </div>
   );
 };
