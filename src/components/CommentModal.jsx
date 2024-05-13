@@ -6,16 +6,27 @@ import Modal from "react-modal";
 import { useSession } from "next-auth/react";
 import { HiX } from "react-icons/hi";
 import { useEffect, useState } from "react";
-import { doc, getFirestore, onSnapshot } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getFirestore,
+  onSnapshot,
+  serverTimestamp,
+} from "firebase/firestore";
 import { app } from "@/firebase";
+import { useRouter } from "next/navigation";
+import { ImSpinner9 } from "react-icons/im";
 
 const CommentModal = () => {
   const [open, setOpen] = useRecoilState(modalState);
   const [postId, setPostId] = useRecoilState(postIdState);
   const [input, setInput] = useState("");
+  const [spinner, setSpinner] = useState(false);
   const { data: session } = useSession();
   const [post, setPost] = useState({});
   const db = getFirestore(app);
+  const router = useRouter();
 
   useEffect(() => {
     if (postId !== "") {
@@ -31,7 +42,27 @@ const CommentModal = () => {
     }
   }, [postId]);
 
-  const sendComment = async () => {};
+  const sendComment = async () => {
+    setSpinner(true);
+    await addDoc(collection(db, "posts", postId, "comments"), {
+      name: session.user.name,
+      username: session.user.username,
+      userImg: session.user.image,
+      comment: input,
+      timestamp: serverTimestamp(),
+    })
+      .then(() => {
+        setInput("");
+        setOpen(false);
+        router.push(`/posts/${postId}`);
+      })
+      .catch((err) => {
+        console.error("Error while adding document: ", err);
+      })
+      .finally(() => {
+        setSpinner(false);
+      });
+  };
 
   return (
     <div>
@@ -86,10 +117,16 @@ const CommentModal = () => {
                 <div className="flex items-center justify-end pt-2.5">
                   <button
                     className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50"
-                    disabled={input.trim() === ""}
+                    disabled={input.trim() === "" || spinner}
                     onClick={sendComment}
                   >
-                    Reply
+                    {spinner ? (
+                      <div className="px-2 py-0.5">
+                        <ImSpinner9 className="size-5 animate-spin" />
+                      </div>
+                    ) : (
+                      "Reply"
+                    )}
                   </button>
                 </div>
               </div>
