@@ -4,6 +4,8 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { FaXTwitter } from "react-icons/fa6";
 import { HiHome, HiDotsHorizontal } from "react-icons/hi";
+import { PiSignOutBold } from "react-icons/pi";
+import { TbLogin } from "react-icons/tb";
 
 const Sidebar = () => {
   const { data: session } = useSession();
@@ -24,19 +26,37 @@ const Sidebar = () => {
         </Link>
 
         {session ? (
-          <button
-            className="w-48 h-9 text-white font-semibold rounded-full bg-blue-400 shadow-md hover:brightness-95 transition-all duration-200 hidden xl:inline"
-            onClick={() => signOut()}
-          >
-            Sign Out
-          </button>
+          <>
+            <button
+              className="w-48 h-9 text-white font-semibold rounded-full bg-blue-400 shadow-md hover:brightness-95 transition-all duration-200 hidden xl:inline"
+              onClick={() => signOut()}
+            >
+              Sign Out
+            </button>
+            <button
+              className="w-fit p-3 hover:bg-blue-100 rounded-full transition-all duration-200 flex items-center xl:hidden"
+              onClick={() => signOut()}
+              title="Sign Out"
+            >
+              <PiSignOutBold className="size-7" />
+            </button>
+          </>
         ) : (
-          <button
-            className="w-48 h-9 text-white font-semibold rounded-full bg-blue-400 shadow-md hover:brightness-95 transition-all duration-200 hidden xl:inline"
-            onClick={() => signIn()}
-          >
-            Sign In
-          </button>
+          <>
+            <button
+              className="w-48 h-9 text-white font-semibold rounded-full bg-blue-400 shadow-md hover:brightness-95 transition-all duration-200 hidden xl:inline"
+              onClick={() => signIn()}
+            >
+              Sign In
+            </button>
+            <button
+              className="w-fit p-3 hover:bg-blue-100 rounded-full transition-all duration-200 flex items-center xl:hidden"
+              onClick={() => signIn()}
+              title="Sign In"
+            >
+              <TbLogin className="size-7" />
+            </button>
+          </>
         )}
       </div>
 
